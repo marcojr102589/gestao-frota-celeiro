@@ -10,14 +10,27 @@
       const retirada = document.getElementById('retirada').value;
       const devolucao = document.getElementById('devolucao').value;
       const placaSelect = document.getElementById('placa');
+      const alerta = document.getElementById('alerta');
 
       if (retirada && devolucao) {
-        const resp = await fetch(`/disponiveis?retirada=${retirada}&devolucao=${devolucao}`);
-        const data = await resp.json();
-        const placas = data.disponiveis || [];
+        try {
+          const resp = await fetch(`/disponiveis?retirada=${retirada}&devolucao=${devolucao}`);
+          const data = await resp.json();
+          const placas = data.disponiveis || [];
 
-        placaSelect.innerHTML = placas.length ? placas.map(p => `<option value="\${p}">\${p}</option>`).join("") : '<option disabled selected>Nenhum disponível</option>';
-        placaSelect.disabled = placas.length === 0;
+          if (placas.length > 0) {
+            placaSelect.innerHTML = placas.map(p => `<option value="${p}">${p}</option>`).join("");
+            placaSelect.disabled = false;
+            alerta.classList.add("d-none");
+          } else {
+            placaSelect.innerHTML = '<option>Nenhum disponível</option>';
+            placaSelect.disabled = true;
+            alerta.classList.remove("d-none");
+          }
+        } catch (e) {
+          alerta.classList.remove("d-none");
+          alerta.innerText = "Erro ao consultar disponibilidade.";
+        }
       }
     }
   </script>
@@ -25,6 +38,7 @@
 <body class="bg-light">
   <div class="container py-5">
     <h2 class="mb-4 text-center">✍️ Reserva de Veículo</h2>
+    <div id="alerta" class="alert alert-warning d-none text-center"></div>
     <form method="post" action="/formulario" class="row g-3">
       <div class="col-md-6">
         <label class="form-label">Nome</label>
