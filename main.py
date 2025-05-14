@@ -52,3 +52,40 @@ def enviar_pre(nome: str = Form(...), email: str = Form(...), retirada: str = Fo
                    (nome, email, retirada, devolucao, motivo))
     conn.commit()
     return RedirectResponse("/inicio", status_code=303)
+@app.get("/admin/prereservas/editar/{id}", response_class=HTMLResponse)
+def editar_pre(request: Request, id: int):
+    if request.session.get("gestor") != True:
+        return RedirectResponse("/inicio")
+    cursor.execute("SELECT locado, valor FROM prereservas WHERE id = ?", (id,))
+    locado, valor = cursor.fetchone() or ("Não", "")
+    return templates.TemplateResponse("editar_prereserva.html", {
+        "request": request,
+        "id": id,
+        "locado": locado,
+        "valor": valor
+    })
+
+@app.post("/admin/prereservas/atualizar")
+def atualizar_pre(id: int = Form(...), locado: str = Form(...), valor: str = Form(...)):
+    cursor.execute("UPDATE prereservas SET locado = ?, valor = ? WHERE id = ?", (locado, valor, id))
+    conn.commit()
+    return RedirectResponse("/admin/prereservas", status_code=303)
+@app.get("/", response_class=HTMLResponse)
+def dashboard(request: Request):
+    if request.session.get("gestor") != True:
+        return RedirectResponse("/inicio")
+    cursor.execute("SELECT * FROM registros ORDER BY id DESC")
+    registros = cursor.fetchall()
+    cursor.execute("SELECT status, COUNT(*) FROM veiculos GROUP BY status")
+    status_count = {s: c for s, c in cursor.fetchall()}
+    cursor.execute("SELECT status_final, COUNT(*) FROM devolucoes GROUP BY status_final")
+    devolucao_count = {s: c for s, c in cursor.fetchall()}
+    cursor.execute("SELECT * FROM prereservas WHERE status = 'pendente'")
+    prereservas = cursor.fetchall()
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
+        "registros": registros,
+        "status_count": status_count,
+        "devolucao_count": devolucao_count,
+        "prereservas": prereservas
+    })
