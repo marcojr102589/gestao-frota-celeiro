@@ -26,6 +26,11 @@
             placaSelect.innerHTML = '<option>Nenhum disponível</option>';
             placaSelect.disabled = true;
             alerta.classList.remove("d-none");
+
+            // Redireciona para pré-reserva
+            setTimeout(() => {
+              window.location.href = `/prereserva?retirada=${retirada}&devolucao=${devolucao}`;
+            }, 2500);
           }
         } catch (e) {
           alerta.classList.remove("d-none");
@@ -38,7 +43,7 @@
 <body class="bg-light">
   <div class="container py-5">
     <h2 class="mb-4 text-center">✍️ Reserva de Veículo</h2>
-    <div id="alerta" class="alert alert-warning d-none text-center"></div>
+    <div id="alerta" class="alert alert-warning d-none text-center">⚠️ Nenhum veículo disponível. Você será redirecionado para uma pré-reserva...</div>
     <form method="post" action="/formulario" class="row g-3">
       <div class="col-md-6">
         <label class="form-label">Nome</label>
