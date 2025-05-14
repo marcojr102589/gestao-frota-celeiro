@@ -1,0 +1,1 @@
+# main.py funcional será adicionado manualmente ou substituído
