@@ -89,3 +89,13 @@ def dashboard(request: Request):
         "devolucao_count": devolucao_count,
         "prereservas": prereservas
     })
+@app.get("/login", response_class=HTMLResponse)
+def login_get(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request, "erro": False})
+
+@app.post("/login")
+def login_post(request: Request, senha: str = Form(...)):
+    if senha == "gestor123":
+        request.session["gestor"] = True
+        return RedirectResponse("/", status_code=303)
+    return templates.TemplateResponse("login.html", {"request": request, "erro": True})
