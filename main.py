@@ -97,3 +97,18 @@ def registrar_devolucao(nome: str = Form(...), placa: str = Form(...), observaco
     cursor.execute("UPDATE veiculos SET status = ? WHERE placa = ?", (status_final, placa))
     conn.commit()
     return RedirectResponse("/devolucao?ok=1", status_code=303)
+@app.get("/admin/veiculos", response_class=HTMLResponse)
+def form_veiculo(request: Request):
+    return templates.TemplateResponse("cadastro_veiculo.html", {"request": request})
+
+@app.post("/admin/veiculos")
+def inserir_veiculo(placa: str = Form(...), status: str = Form(...)):
+    cursor.execute("INSERT OR IGNORE INTO veiculos (placa, status) VALUES (?, ?)", (placa.upper(), status))
+    conn.commit()
+    return RedirectResponse("/admin/veiculos/listar", status_code=303)
+
+@app.get("/admin/veiculos/listar", response_class=HTMLResponse)
+def listar_veiculos(request: Request):
+    cursor.execute("SELECT * FROM veiculos ORDER BY placa")
+    veiculos = cursor.fetchall()
+    return templates.TemplateResponse("listar_veiculos.html", {"request": request, "veiculos": veiculos})
