@@ -155,3 +155,24 @@ def ver_prereservas(request: Request):
     cursor.execute("SELECT * FROM prereservas ORDER BY retirada")
     dados = cursor.fetchall()
     return templates.TemplateResponse("listar_prereservas.html", {"request": request, "prereservas": dados})
+@app.get("/disponiveis")
+def listar_disponiveis(retirada: str, devolucao: str):
+    from datetime import datetime
+    data_ini = datetime.strptime(retirada, "%Y-%m-%d")
+    data_fim = datetime.strptime(devolucao, "%Y-%m-%d")
+
+    cursor.execute("SELECT placa FROM veiculos WHERE status = 'disponivel'")
+    todas = [p[0] for p in cursor.fetchall()]
+
+    cursor.execute("SELECT placa, retirada, devolucao FROM registros")
+    registros = cursor.fetchall()
+
+    indisponiveis = set()
+    for placa, r_ini, r_fim in registros:
+        r_ini = datetime.strptime(r_ini, "%Y-%m-%d")
+        r_fim = datetime.strptime(r_fim, "%Y-%m-%d")
+        if (r_ini <= data_fim and r_fim >= data_ini):
+            indisponiveis.add(placa)
+
+    disponiveis = [p for p in todas if p not in indisponiveis]
+    return {"disponiveis": disponiveis}
