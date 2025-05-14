@@ -96,6 +96,27 @@ def registrar_devolucao(nome: str = Form(...), placa: str = Form(...), observaco
                    (nome, placa, observacoes, status_final, filename))
     cursor.execute("UPDATE veiculos SET status = ? WHERE placa = ?", (status_final, placa))
     conn.commit()
+# Verifica pré-reservas compatíveis com devolução
+cursor.execute("""
+    SELECT id, retirada, devolucao FROM prereservas
+    WHERE status = 'pendente'
+""")
+prereservas = cursor.fetchall()
+from datetime import datetime
+
+data_disponivel = datetime.strptime(retirada, "%Y-%m-%d")
+
+for p in prereservas:
+    id_pre, data_ret, data_dev = p
+    ret_date = datetime.strptime(data_ret, "%Y-%m-%d")
+    dev_date = datetime.strptime(data_dev, "%Y-%m-%d")
+
+    # Se a devolução do veículo ocorre ANTES da próxima pré-reserva
+    if ret_date >= data_disponivel:
+        cursor.execute("UPDATE prereservas SET status = 'atendido' WHERE id = ?", (id_pre,))
+        conn.commit()
+        break  # atende apenas a primeira compatível
+
     return RedirectResponse("/devolucao?ok=1", status_code=303)
 @app.get("/admin/veiculos", response_class=HTMLResponse)
 def form_veiculo(request: Request):
