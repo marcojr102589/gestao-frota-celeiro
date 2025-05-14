@@ -1,17 +1,18 @@
 from fastapi import FastAPI, Request, Form, UploadFile, File
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 import os, shutil, sqlite3
 from datetime import datetime
+# import smtplib  # Para e-mail futuro
+# from email.mime.text import MIMEText
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="gestaofrota123")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# Banco
 conn = sqlite3.connect("frota.db", check_same_thread=False)
 cursor = conn.cursor()
 
@@ -50,7 +51,14 @@ def dashboard(request: Request):
     registros = cursor.fetchall()
     cursor.execute("SELECT status, COUNT(*) FROM veiculos GROUP BY status")
     status_count = {s: c for s, c in cursor.fetchall()}
-    return templates.TemplateResponse("dashboard.html", {"request": request, "registros": registros, "status_count": status_count})
+    cursor.execute("SELECT status_final, COUNT(*) FROM devolucoes GROUP BY status_final")
+    devolucao_count = {s: c for s, c in cursor.fetchall()}
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
+        "registros": registros,
+        "status_count": status_count,
+        "devolucao_count": devolucao_count
+    })
 
 @app.get("/formulario", response_class=HTMLResponse)
 def formulario(request: Request):
@@ -61,6 +69,7 @@ def reservar(nome: str = Form(...), email: str = Form(...), placa: str = Form(..
     cursor.execute("INSERT INTO registros (nome, email, placa, retirada, devolucao) VALUES (?, ?, ?, ?, ?)", (nome, email, placa, retirada, devolucao))
     cursor.execute("UPDATE veiculos SET status = 'em_uso' WHERE placa = ?", (placa,))
     conn.commit()
+    # Aviso por e-mail futuro
     return RedirectResponse("/inicio", status_code=303)
 
 @app.get("/devolucao", response_class=HTMLResponse)
@@ -81,7 +90,6 @@ def registrar_devolucao(nome: str = Form(...), placa: str = Form(...), observaco
                    (nome, placa, observacoes, status_final, img_path))
     cursor.execute("UPDATE veiculos SET status = ? WHERE placa = ?", (status_final, placa))
     conn.commit()
-    # atende pré-reserva
     cursor.execute("SELECT id, retirada FROM prereservas WHERE status = 'pendente'")
     for pid, r in cursor.fetchall():
         if datetime.strptime(r, "%Y-%m-%d") >= datetime.now():
@@ -111,8 +119,8 @@ def listar(request: Request):
     return templates.TemplateResponse("listar_veiculos.html", {"request": request, "veiculos": veiculos})
 
 @app.get("/prereserva", response_class=HTMLResponse)
-def prereserva(request: Request):
-    return templates.TemplateResponse("prereserva.html", {"request": request})
+def prereserva(request: Request, retirada: str = "", devolucao: str = ""):
+    return templates.TemplateResponse("prereserva.html", {"request": request, "retirada": retirada, "devolucao": devolucao})
 
 @app.post("/prereserva")
 def enviar_pre(nome: str = Form(...), email: str = Form(...), retirada: str = Form(...), devolucao: str = Form(...), motivo: str = Form(...)):
@@ -145,3 +153,7 @@ def listar_disponiveis(retirada: str, devolucao: str):
             indisponiveis.add(placa)
     disponiveis = [p for p in todas if p not in indisponiveis]
     return {"disponiveis": disponiveis}
+
+@app.get("/backup")
+def download_db():
+    return FileResponse("frota.db", filename="frota-backup.db", media_type="application/octet-stream")
