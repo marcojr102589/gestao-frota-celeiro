@@ -112,3 +112,33 @@ def listar_veiculos(request: Request):
     cursor.execute("SELECT * FROM veiculos ORDER BY placa")
     veiculos = cursor.fetchall()
     return templates.TemplateResponse("listar_veiculos.html", {"request": request, "veiculos": veiculos})
+from fastapi.responses import HTMLResponse, RedirectResponse
+from starlette.middleware.sessions import SessionMiddleware
+
+app.add_middleware(SessionMiddleware, secret_key="sua_chave_secreta")
+
+@app.get("/inicio", response_class=HTMLResponse)
+def pagina_inicial(request: Request):
+    gestor = request.session.get("gestor") == True
+    return templates.TemplateResponse("home.html", {"request": request, "gestor": gestor})
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request, "erro": False})
+
+@app.post("/login")
+def process_login(request: Request, senha: str = Form(...)):
+    if senha == "gestor123":  # Senha fixa inicial
+        request.session["gestor"] = True
+        return RedirectResponse("/inicio", status_code=302)
+    return templates.TemplateResponse("login.html", {"request": request, "erro": True})
+
+@app.get("/logout")
+def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse("/inicio", status_code=302)
+@app.get("/admin/veiculos", response_class=HTMLResponse)
+def form_veiculo(request: Request):
+    if request.session.get("gestor") != True:
+        return RedirectResponse("/inicio")
+    return templates.TemplateResponse("cadastro_veiculo.html", {"request": request})
