@@ -4,15 +4,7 @@
   <meta charset="UTF-8">
   <title>Reserva de Veículo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      background-image: url('/static/logo_celeiro.png');
-      background-size: 300px;
-      background-repeat: no-repeat;
-      background-position: center top;
-      background-color: #f8f9fa;
-    }
-  </style>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script>
     async function consultarDisponiveis() {
@@ -28,20 +20,18 @@
           const placas = data.disponiveis || [];
 
           if (placas.length > 0) {
-            placaSelect.innerHTML = placas.map(p => `<option value="\${p}">\${p}</option>`).join("");
+            placaSelect.innerHTML = placas.map(p => `<option value="${p}">${p}</option>`).join("");
             placaSelect.disabled = false;
             alerta.classList.add("d-none");
           } else {
             placaSelect.innerHTML = '<option>Nenhum disponível</option>';
             placaSelect.disabled = true;
             alerta.classList.remove("d-none");
-
-            // Redirecionar após 2s
             setTimeout(() => {
               window.location.href = `/prereserva?retirada=${retirada}&devolucao=${devolucao}`;
             }, 2000);
           }
-        } catch (e) {
+        } catch {
           alerta.classList.remove("d-none");
           alerta.innerText = "Erro ao verificar disponibilidade.";
         }
@@ -50,8 +40,8 @@
   </script>
 </head>
 <body class="bg-light">
-  <div class="container py-5">
-    <h2 class="mb-4 text-center">✍️ Reserva de Veículo</h2>
+  <div class="container py-4">
+    <h2 class="text-center mb-4">✍️ Reserva de Veículo</h2>
     <div id="alerta" class="alert alert-warning d-none text-center">
       ⚠️ Nenhum veículo disponível. Redirecionando para Pré-Reserva...
     </div>
