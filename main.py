@@ -106,7 +106,7 @@ def reservar(nome: str = Form(...), email: str = Form(...), placa: str = Form(..
 
     # Enviar e-mail para usuário
     conteudo = f"Olá {nome}, sua reserva para o veículo {placa} foi confirmada."
-Período: {retirada} a {devolucao}."
+conteudo += f"Período: {retirada} a {devolucao}."
     enviar_email(email, "Reserva Confirmada", conteudo)
     return RedirectResponse("/inicio", status_code=303)
 
