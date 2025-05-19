@@ -3,9 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Gestão de Frota - Celeiro</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 25px;
+            text-decoration: none;
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .reserva { background-color: #007bff; }
+        .devolucao { background-color: #ffc107; color: black; }
+        .gestor { background-color: #343a40; }
+    </style>
 </head>
 <body>
-    <h1>🚚 Gestão de Frota - Celeiro</h1>
-    <a href="/reserva">Reserva</a> | <a href="/devolucao">Devolução</a> | <a href="/login">Login Gestor</a>
+    <h1>🚛 Gestão de Frota - Celeiro</h1>
+    <a class="btn reserva" href="/reserva">✍️ Reserva de Veículo</a>
+    <a class="btn devolucao" href="/devolucao">📦 Devolução de Veículo</a>
+    <a class="btn gestor" href="/login">🔐 Acesso Gestor</a>
 </body>
 </html>
