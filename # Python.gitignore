@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# VSCode settings (opcional)
+.vscode/
+
+# IDEs
+.idea/
+*.swp
+*.swo
+
+# Byte-compiled files
+*.pyc
+
+# Environment
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# SQLite database
+*.db
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and backups
+*.log
+*.bak
+*.tmp
+
+# Render deployment
+render.yaml
+
+# Git config backup
+*.orig
+
+# Static/cache folders
+*.tar.gz
+*.zip
+*.rar
+
+# OS
+ehthumbs.db
+Icon?
+desktop.ini
