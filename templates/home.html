@@ -1,33 +1,27 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Gestão de Frota - Celeiro</title>
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #f8f9fa;
-            text-align: center;
-            padding-top: 50px;
-        }
-        .btn {
-            display: inline-block;
-            margin: 10px;
-            padding: 15px 25px;
-            text-decoration: none;
-            color: white;
-            border-radius: 5px;
-            font-weight: bold;
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        h1 { color: #333; }
+        .btn-container { margin-top: 30px; }
+        a.button {
+            display: inline-block; padding: 15px 30px; margin: 10px;
+            text-decoration: none; color: white; border-radius: 8px;
+            font-size: 18px; transition: background 0.3s;
         }
         .reserva { background-color: #007bff; }
-        .devolucao { background-color: #ffc107; color: black; }
+        .devolucao { background-color: #ffc107; }
         .gestor { background-color: #343a40; }
     </style>
 </head>
 <body>
     <h1>🚛 Gestão de Frota - Celeiro</h1>
-    <a class="btn reserva" href="/reserva">✍️ Reserva de Veículo</a>
-    <a class="btn devolucao" href="/devolucao">📦 Devolução de Veículo</a>
-    <a class="btn gestor" href="/login">🔐 Acesso Gestor</a>
+    <div class="btn-container">
+        <a class="button reserva" href="/reserva">✍️ Reserva de Veículo</a>
+        <a class="button devolucao" href="/devolucao">📦 Devolução de Veículo</a>
+        <a class="button gestor" href="/login">🔐 Acesso Gestor</a>
+    </div>
 </body>
 </html>
