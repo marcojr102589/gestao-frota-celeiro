@@ -1,1 +1,1 @@
-// Simulação do conteúdo de main.py
+# Simulação do conteúdo de main.py
